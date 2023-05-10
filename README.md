@@ -10,6 +10,10 @@
 
 - **Schemas pre-built:** The Hapi FHIR JPA server provides pre-built schemas for common FHIR resources, which reduces the development time required to build a native FHIR server.
 
+- **Available as a Docker image**
+
+- **Active community, well maintained**
+
 ## Why is PostgreSQL (or any SQL) preferred instead of MongoDB (or any NoSQL), in the context of FHIR?
 
 - **Data Structure**
