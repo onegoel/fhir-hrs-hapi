@@ -14,6 +14,11 @@ services:
       spring.datasource.driverClassName: org.postgresql.Driver
     depends_on:
       - db
+    volumes:
+      - ./hapi-data:/data/hapi
+    configs:
+      - source: hapi
+        target: /app/config/application.yaml
   db:
     container_name: db
     image: postgres
@@ -35,3 +40,7 @@ services:
     volumes:
       - .:/app
     command: npm run dev
+
+configs:
+  hapi:
+    file: ./hapi.application.yaml

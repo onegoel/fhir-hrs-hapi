@@ -52,6 +52,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "fhir": "^4.11.2",
     "fhir-kit-client": "^1.9.2",
     "fhirclient": "^2.5.2",
     "generate-schema": "^2.6.0",
