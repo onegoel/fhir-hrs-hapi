@@ -1,6 +1,5 @@
 import client from '../fhir/client.config';
-import express, {NextFunction, Request, Response} from 'express';
-import {Router} from 'express';
+import {NextFunction, Request, Response, Router} from 'express';
 const router = Router();
 
 router.get('/', (req, res) => {
@@ -20,7 +19,8 @@ router.get(
       const resource = await client.search({resourceType});
       res.json(resource);
     } catch (err: any) {
-      res.status(err.response.status).json(err);
+      // res.status(err.response.status).json(err);
+      next(err);
     }
   }
 );
@@ -47,7 +47,8 @@ router.get(
       // });
       res.status(200).json(resource);
     } catch (err: any) {
-      res.status(err.response.status).json(err);
+      // res.status(err.response.status).json(err);
+      next(err);
     }
   }
 );
@@ -66,7 +67,8 @@ router.post(
       });
       res.status(201).json(resource);
     } catch (err: any) {
-      res.status(err.response.status).json(err);
+      // res.status(err.response.status).json(err);
+      next(err);
     }
   }
 );
@@ -87,7 +89,8 @@ router.put(
       });
       res.status(200).json(resource);
     } catch (err: any) {
-      res.status(err.response.status).json(err);
+      // res.status(err.response.status).json(err);
+      next(err);
     }
   }
 );
@@ -107,7 +110,8 @@ router.delete(
       });
       res.status(200).json(resource);
     } catch (err: any) {
-      res.status(err.response.status).json(err);
+      // res.status(err.response.status).json(err);
+      next(err);
     }
   }
 );

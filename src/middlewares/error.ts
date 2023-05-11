@@ -4,9 +4,7 @@ import {
   type Response,
   type NextFunction,
   type ErrorRequestHandler,
-  response,
 } from 'express';
-import {config} from 'dotenv';
 
 const errorHandler: ErrorRequestHandler = (
   error: Error | any,
@@ -18,7 +16,7 @@ const errorHandler: ErrorRequestHandler = (
     next(error);
   }
 
-  // console.log(error)
+  console.log(error);
 
   switch (true) {
     case isHttpError(error):
