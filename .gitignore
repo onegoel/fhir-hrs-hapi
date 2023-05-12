@@ -2,3 +2,5 @@ node_modules
 db
 fhir.js
 *.json
+examples.json*
+hapi-data
