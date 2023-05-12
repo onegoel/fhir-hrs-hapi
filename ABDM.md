@@ -1,0 +1,139 @@
+# Understanding the ABDM FHIR ecosystem defined by NRCES
+
+## Introduction
+
+Some important HL7 FHIR terms understood the ABDM FHIR ecosystem are as follows,
+
+**I. Clinical Artifact:** can be of the the following types,
+1. Diagnostic Report
+2. Discharge Summary
+3. Health Document Record
+4. Immunization Record
+5. OPConsult Record
+6. Prescription Record
+7. Wellness Record
+
+**II. Bundle:** is a collection of resources. It can be of the following types,
+1. Document Bundle - first resource is a Composition
+2. Message Bundle - first resource is a MessageHeader
+3. Transaction Bundle - atomic transaction (make requests as part of body, returns a Bundle)
+4. History Bundle 
+5. Searchset Bundle - search/query interaction/operation/message results
+6. Collection Bundle
+7. Batch Bundle - body includes independent group of actions
+8. Transaction-Response Bundle - error free responses on transaction bundle
+9. Batch-Response Bundle - may include errors
+
+**III. Resource:** is atomic unit of exchange in FHIR. It can be Patient, Practitioner, Organization, Medication, etc.
+
+**IV. Composition:** is a document that is a statement of healthcare information that is assembled together into a single document that provides a single coherent statement of meaning, establishes its own context and that has clinical attestation with regard to who is making the statement. A Composition defines the structure and narrative content necessary for a document. A Composition can contain any number of other resources, including Sections, Images, Medications, etc. A Composition can be used to define a CDA document, a discharge summary, a referral letter, or any other form of clinical document.
+
+> If Bundle has `type: document` then first resource must be a Composition and any other resources referenced from Composition must be included as subsequent entries in the Bundle (for example Patient, Practitioner, Encounter, etc.)
+---
+
+## Examining a Bundle of `type: document`
+
+Dissecting a OPConsult Record Bundle. Assuming the server we are using HAPI FHIR JPA Server -
+
+```
+{
+    resourceType: "Bundle",
+    id: "uuid (as assigned by server)",
+    type: "document",
+    meta: {
+        versionId: "1",
+        lastUpdated: "2019-10-10T12:00:00Z"
+    },
+    entry: [
+        {
+            resource: {
+                resourceType: "Composition",
+                id: "uuid (as assigned by server)",
+                meta: {
+                    versionId: "1",
+                    lastUpdated: "2019-10-10T12:00:00Z"
+                },
+                status: "final",
+                type: {
+                    coding: [
+                        {
+                            system: "http://loinc.org",
+                            code: "34133-9",
+                            display: "Clinical Consultation Report"
+                        }
+                    ]
+                },
+                subject: {
+                    reference: "Patient/patient_uuid"
+                },
+                encounter: {
+                    reference: "Encounter/encounter_uuid"
+                },
+                date: "2019-10-10T12:00:00Z",
+                author: [
+                    {
+                        reference: "Practitioner/practitioner_uuid",
+                        display: "Dr. John Doe"
+                    }
+                ],
+                title: "Consultation Report",
+                custodian: {
+                    reference: "Organization/organization_uuid",
+                    display: "ABC Hospital"
+                },
+                section: [
+                    {
+                        title: "Chief Complaint",
+                        code: {
+                            coding: [
+                                {
+                                    system: "http://snomed.info/sct",
+                                    code: "43116000",
+                                    display: "Chief Complaint"
+                                }
+                            ]
+                        }
+                        text: {
+                            status: "generated",
+                            div: "<div>Chief Complaint</div>"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            resource: {
+                resourceType: "Patient",
+                id: "123",
+                meta: {
+                    versionId: "1",
+                    lastUpdated: "2019-10-10T12:00:00Z"
+                },
+
+            }
+        }
+}
+```
+Some important points to note here are as follows,
+
+1. The Bundle has `type: document` and the first resource is a Composition.
+2. The Composition has `status: final` and `type: Clinical Consultation Report`.
+3. `id` is required by ABDM however there are no specifications on how to generate it. HAPI FHIR JPA Server generates a UUID. 
+4. `meta` is also generated by HAPI FHIR, we don't need to worry about it.
+5. `subject` is a reference to the Patient resource. The Patient resource is included as a subsequent entry in the Bundle.
+6. `type` inside the Composition is highly important.
+    - `type` is a CodeableConcept.
+    - `type.coding` is an array of Coding.
+    - `type.coding[0].system` is the code system. (we have to use http://snomed.info/sct)
+    - `type.coding[0].code` is the code. (example: 34133-9 is LOINC code for Clinical Consultation Report)
+    - `type.coding[0].display` is the display name. (example: Clinical Consultation Report)
+7. `section` is an array that consists of Sections, each one represents some sort of medical info such as Chief Complaint, History of Present Illness, Family History etc.
+
+## Resources
+
+1. [FHIR Documentation](https://www.hl7.org/fhir/)
+2. [FHIR REST API](https://www.hl7.org/fhir/http.html)
+3. [NRCES ABDM FHIR Implementation Guide](https://www.nrces.in/ndhm/fhir/r4/index.html)
+4. [HAPI FHIR JPA Server](https://hapifhir.io/hapi-fhir/docs/server_jpa/introduction.html)
+5. [NRCES ABDM FHIR Services - Tools and Technologies](https://nrces.in/services/tools-and-technologies)
+6. [FHIR Implementation Discussion for ABDM Open – House 4th April 2022](https://www.youtube.com/watch?v=7sCVVHLALNg)
